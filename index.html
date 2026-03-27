@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Générateur d'email – Carepolis Location</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Jost',Georgia,sans-serif;background:#f4f4f0;min-height:100vh}
+.app{display:grid;grid-template-columns:320px 1fr;min-height:100vh}
+.panel{background:#fff;border-right:1px solid #e8e8e8;padding:2rem 1.5rem;overflow-y:auto;position:sticky;top:0;height:100vh}
+.panel-logo{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:#d4af7a;letter-spacing:3px;text-transform:uppercase;margin-bottom:0.25rem}
+.panel-sub{font-size:10px;color:#aaa;letter-spacing:3px;text-transform:uppercase;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid #f0f0f0}
+.section-sep{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#d4af7a;margin:1.25rem 0 0.9rem;padding-bottom:6px;border-bottom:0.5px solid #f0f0f0}
+.field-group{margin-bottom:1rem}
+.field-group label{display:block;font-size:11px;color:#888;margin-bottom:5px;text-transform:uppercase;letter-spacing:1px}
+.field-group input,.field-group select,.field-group textarea{width:100%;font-size:13px;padding:8px 10px;border:1px solid #e8e8e8;border-radius:6px;background:#fafafa;color:#1a1a1a;font-family:'Jost',sans-serif;transition:border 0.2s}
+.field-group input:focus,.field-group select:focus,.field-group textarea:focus{outline:none;border-color:#d4af7a;background:#fff}
+.field-group textarea{resize:vertical;line-height:1.6}
+.checkbox-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.checkbox-row input[type=checkbox]{width:15px;height:15px;accent-color:#d4af7a}
+.checkbox-row label{font-size:12px;color:#666}
+.btn-eml{width:100%;margin-top:1.5rem;padding:14px;background:#1a1a1a;color:#d4af7a;border:none;border-radius:6px;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Jost',sans-serif;transition:background 0.2s}
+.btn-eml:hover{background:#333}
+.instructions{margin-top:1rem;background:#fdfbf5;border:1px solid #d4af7a;border-radius:6px;padding:1rem;font-size:12px;color:#666;line-height:1.8}
+.instructions strong{color:#1a1a1a;display:block;margin-bottom:6px}
+.step{display:flex;gap:8px;margin-bottom:4px}
+.step-num{color:#d4af7a;font-weight:600;flex-shrink:0}
+.preview{padding:2.5rem;overflow-y:auto;background:#f4f4f0}
+.preview-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#aaa;margin-bottom:1.5rem;text-align:center}
+.email-wrap{max-width:640px;margin:0 auto;background:#fff;border:1px solid #e0e0e0;border-radius:12px;overflow:hidden;font-family:'Jost',sans-serif}
+.e-header{background:#1a1a1a;padding:1.75rem 2rem 1.4rem}
+.e-logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:#d4af7a;letter-spacing:4px;text-transform:uppercase}
+.e-tagline{font-size:9px;color:#888;letter-spacing:4px;text-transform:uppercase;margin-top:4px}
+.e-divider{width:35px;height:1px;background:#d4af7a;margin:1rem 0}
+.e-subject{font-size:10px;color:#888;letter-spacing:2px;text-transform:uppercase}
+.e-body{padding:2rem}
+.e-greeting{font-family:'Cormorant Garamond',serif;font-size:19px;color:#1a1a1a;font-weight:400;margin-bottom:0.8rem}
+.e-intro{font-size:13px;color:#555;line-height:1.8;margin-bottom:1.5rem;font-weight:300}
+.e-section{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#d4af7a;margin-bottom:0.75rem;font-weight:500;margin-top:1rem}
+.e-car-banner{background:#f9f9f7;border-radius:8px;padding:1rem 1.25rem;display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;border:0.5px solid #ebebeb}
+.e-car-badge{width:44px;height:44px;border-radius:50%;background:#1a1a1a;display:flex;align-items:center;justify-content:center;border:1px solid #d4af7a;flex-shrink:0}
+.e-car-badge span{font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:600;color:#d4af7a}
+.e-car-model{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:#1a1a1a}
+.e-car-dates{font-size:11px;color:#888;margin-top:2px}
+.e-rates{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1.5rem}
+.e-rate{border:0.5px solid #e8e8e8;border-radius:8px;padding:1rem;background:#fff}
+.e-rate.feat{border:1.5px solid #d4af7a;background:#fdfbf5}
+.e-rbadge{font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:500;color:#d4af7a;margin-bottom:3px}
+.e-rbadge.std{color:#aaa}
+.e-rname{font-size:11px;color:#aaa;margin-bottom:0.5rem}
+.e-rprice{font-family:'Cormorant Garamond',serif;font-size:30px;color:#1a1a1a;font-weight:500;line-height:1}
+.e-runit{font-size:12px;color:#aaa}
+.e-rtotal{font-size:11px;color:#aaa;margin-top:3px}
+.e-option{display:flex;align-items:flex-start;gap:0.75rem;padding:0.75rem 0;border-bottom:0.5px solid #f0f0f0}
+.e-option:last-child{border-bottom:none}
+.e-odot{width:5px;height:5px;border-radius:50%;background:#d4af7a;margin-top:5px;flex-shrink:0}
+.e-oname{font-size:13px;color:#1a1a1a;font-weight:500;margin-bottom:2px}
+.e-odesc{font-size:11px;color:#aaa;line-height:1.5}
+.e-oprice{font-family:'Cormorant Garamond',serif;font-size:16px;color:#1a1a1a;text-align:right;flex-shrink:0}
+.e-ototal{font-size:10px;color:#bbb;text-align:right}
+.e-qbox{border:1.5px solid #d4af7a;border-radius:8px;padding:1.25rem;margin:1rem 0 1.5rem;background:#fdfbf5}
+.e-qtitle{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#d4af7a;margin-bottom:0.5rem}
+.e-qtext{font-size:12px;color:#444;line-height:1.7;margin-bottom:0.75rem}
+.e-qopt{display:flex;gap:0.5rem;font-size:12px;color:#555;margin-bottom:0.4rem}
+.e-qbullet{color:#d4af7a;font-weight:600}
+.e-msg{font-size:13px;color:#444;line-height:1.8;margin:1rem 0 1.5rem;font-style:italic;border-left:2px solid #d4af7a;padding-left:1rem}
+.e-closing{font-size:13px;color:#555;line-height:1.8;margin-bottom:1.5rem;margin-top:1rem}
+.e-sig{font-family:'Cormorant Garamond',serif;font-size:16px;color:#1a1a1a;font-style:italic}
+.e-sigrole{font-size:10px;color:#d4af7a;letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+.e-sigcontact{font-size:11px;color:#bbb;margin-top:6px}
+.e-footer{background:#f9f9f7;padding:0.75rem 2rem;display:flex;justify-content:space-between;border-top:0.5px solid #ebebeb;margin-top:2rem}
+.e-fbrand{font-size:10px;color:#bbb;letter-spacing:2px;text-transform:uppercase}
+.e-fsite{font-size:10px;color:#d4af7a}
+@media(max-width:768px){.app{grid-template-columns:1fr}.panel{position:static;height:auto}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="panel">
+    <div class="panel-logo">Carepolis</div>
+    <div class="panel-sub">Générateur d'email location</div>
+
+    <div class="section-sep">Client</div>
+    <div class="field-group">
+      <label>Civilité</label>
+      <select id="civ"><option>Madame</option><option>Monsieur</option></select>
+    </div>
+    <div class="field-group"><label>Nom</label><input id="nom" value="Potestivo"></div>
+
+    <div class="section-sep">Location</div>
+    <div class="field-group"><label>Véhicule</label><input id="vehicule" value="Volkswagen Polo · Automatique"></div>
+    <div class="field-group"><label>Date début</label><input id="date1" value="4 juin"></div>
+    <div class="field-group"><label>Date fin</label><input id="date2" value="11 juin"></div>
+    <div class="field-group"><label>Nombre de jours</label><input id="jours" type="number" value="7" min="1"></div>
+    <div class="field-group"><label>Lieu de remise</label><input id="lieu" value="Cogolin"></div>
+
+    <div class="section-sep">Offre recommandée</div>
+    <div class="field-group"><label>Nom du modèle recommandé</label><input id="modele_reco" value="Formule Troc"></div>
+    <div class="field-group"><label>Prix formule éco (€/jour)</label><input id="prix1" type="number" value="45"></div>
+    <div class="field-group"><label>Prix formule recommandée (€/jour)</label><input id="prix2" type="number" value="52"></div>
+
+    <div class="section-sep">Options</div>
+    <div class="checkbox-row"><input type="checkbox" id="optPP" checked><label>Assurance Pare-brise & Pneus (5€/j)</label></div>
+    <div class="checkbox-row"><input type="checkbox" id="optFR" checked><label>Réduction de Franchise (10€/j)</label></div>
+    <div class="checkbox-row"><input type="checkbox" id="optLiv" checked><label>Proposer la livraison (+100€)</label></div>
+
+    <div class="section-sep">Message personnalisé</div>
+    <div class="field-group">
+      <label>Note pour le client (optionnel)</label>
+      <textarea id="message" rows="3" placeholder="Ex : N'hésitez pas à nous appeler..."></textarea>
+    </div>
+
+    <div class="section-sep">Coordonnées</div>
+    <div class="field-group"><label>Email du client</label><input id="emailDest" placeholder="client@email.com"></div>
+    <div class="field-group"><label>Téléphone agence</label><input id="tel" value="04 83 09 40 03"></div>
+
+    <button class="btn-eml" onclick="genererEML()">✉️ Ouvrir dans Outlook</button>
+
+    <div class="instructions">
+      <strong>Mode d'emploi :</strong>
+      <div class="step"><span class="step-num">1.</span><span>Remplissez le formulaire</span></div>
+      <div class="step"><span class="step-num">2.</span><span>Cliquez "Ouvrir dans Outlook"</span></div>
+      <div class="step"><span class="step-num">3.</span><span>Un fichier .eml se télécharge</span></div>
+      <div class="step"><span class="step-num">4.</span><span>Double-cliquez ce fichier</span></div>
+      <div class="step"><span class="step-num">5.</span><span>Outlook s'ouvre avec l'email mis en forme ✅</span></div>
+      <div class="step"><span class="step-num">6.</span><span>Envoyez !</span></div>
+    </div>
+  </div>
+
+  <div class="preview">
+    <div class="preview-label">Aperçu en temps réel</div>
+    <div class="email-wrap" id="emailPreview">
+      <div class="e-header">
+        <div class="e-logo">Carepolis</div>
+        <div class="e-tagline">Location de véhicules · Côte d'Azur</div>
+        <div class="e-divider"></div>
+        <div class="e-subject" id="p-subject"></div>
+      </div>
+      <div class="e-body">
+        <div class="e-greeting" id="p-greeting"></div>
+        <p class="e-intro" id="p-intro"></p>
+        <div class="e-section">Votre véhicule</div>
+        <div class="e-car-banner">
+          <div class="e-car-badge"><span id="p-badge">VW</span></div>
+          <div>
+            <div class="e-car-model" id="p-model"></div>
+            <div class="e-car-dates" id="p-dates"></div>
+          </div>
+        </div>
+        <div class="e-section">Nos formules</div>
+        <div class="e-rates">
+          <div class="e-rate"><div class="e-rbadge std">Économique</div><div class="e-rname">Location standard</div><div class="e-rprice" id="p-p1"></div><div class="e-rtotal" id="p-t1"></div></div>
+          <div class="e-rate feat"><div class="e-rbadge">★ Recommandée</div><div class="e-rname" id="p-modele-reco"></div><div class="e-rprice" id="p-p2"></div><div class="e-rtotal" id="p-t2"></div></div>
+        </div>
+        <div id="block-options"></div>
+        <div id="block-livraison"></div>
+        <div id="block-message"></div>
+        <p class="e-closing">Ces options peuvent être combinées selon vos préférences. Dès réception de votre réponse, nous confirmerons votre réservation dans les meilleurs délais.<br><br>Nous nous réjouissons de vous accueillir sur la Côte d'Azur.</p>
+        <div class="e-sig">L'équipe Carepolis</div>
+        <div class="e-sigrole">Service réservation · <span id="p-lieu3"></span></div>
+        <div class="e-sigcontact" id="p-tel"></div>
+      </div>
+      <div class="e-footer">
+        <div class="e-fbrand">Carepolis · Location de véhicules · Var</div>
+        <div class="e-fsite">carepolis.com</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function get(id){return document.getElementById(id)}
+function val(id){return get(id).value.trim()}
+function badge(veh){
+  if(veh.includes('Volkswagen')||veh.includes('VW')) return 'VW';
+  if(veh.includes('Audi')) return 'AU';
+  if(veh.includes('Skoda')||veh.includes('Škoda')) return 'SK';
+  if(veh.includes('Ducati')) return 'DC';
+  if(veh.includes('KTM')) return 'KT';
+  return veh.substring(0,2).toUpperCase();
+}
+
+function buildHTML(){
+  const civ=val('civ'),nom=val('nom');
+  const d1=val('date1'),d2=val('date2'),j=parseInt(val('jours'))||1;
+  const lieu=val('lieu'),veh=val('vehicule');
+  const p1=parseInt(val('prix1'))||0,p2=parseInt(val('prix2'))||0;
+  const tel=val('tel'),msg=val('message');
+  const modReco=val('modele_reco')||'Formule recommandée';
+  const salut=civ==='Madame'?'Chère':'Cher';
+  const bdg=badge(veh);
+  const pp=get('optPP').checked,fr=get('optFR').checked,liv=get('optLiv').checked;
+
+  let optHTML='';
+  if(pp||fr){
+    optHTML+=`<p style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#d4af7a;margin:20px 0 10px;font-weight:bold">OPTIONS D'ASSURANCE</p>`;
+    if(pp) optHTML+=`<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px"><tr><td width="8" valign="top"><div style="width:6px;height:6px;border-radius:50%;background:#d4af7a;margin-top:4px"></div></td><td><b style="font-size:13px;color:#1a1a1a">Assurance Pare-brise &amp; Pneus</b><br><span style="font-size:11px;color:#aaa">Couverture des dommages pare-brise et pneus, souvent exclus des contrats standards.</span></td><td align="right" valign="top" style="font-size:16px;color:#1a1a1a;white-space:nowrap"><b>5 €/j</b><br><span style="font-size:10px;color:#bbb">${5*j} € / ${j}j</span></td></tr></table>`;
+    if(fr) optHTML+=`<table width="100%" cellpadding="0" cellspacing="0"><tr><td width="8" valign="top"><div style="width:6px;height:6px;border-radius:50%;background:#d4af7a;margin-top:4px"></div></td><td><b style="font-size:13px;color:#1a1a1a">Réduction de Franchise</b><br><span style="font-size:11px;color:#aaa">Diminue significativement votre franchise en cas de sinistre.</span></td><td align="right" valign="top" style="font-size:16px;color:#1a1a1a;white-space:nowrap"><b>10 €/j</b><br><span style="font-size:10px;color:#bbb">${10*j} € / ${j}j</span></td></tr></table>`;
+  }
+
+  const livHTML=liv?`<p style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#d4af7a;margin:20px 0 10px;font-weight:bold">REMISE DU VÉHICULE</p><table width="100%" cellpadding="16" cellspacing="0" style="border:2px solid #d4af7a;border-radius:8px;background:#fdfbf5;margin-bottom:20px"><tr><td><p style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#d4af7a;margin:0 0 8px">UNE PRÉCISION NÉCESSAIRE</p><p style="font-size:13px;color:#444;margin:0 0 12px">Afin de finaliser votre devis, pourriez-vous nous indiquer votre préférence pour la remise du véhicule ?</p><p style="font-size:13px;color:#555;margin:0 0 6px"><span style="color:#d4af7a;font-weight:bold">›</span> Récupération à notre concession à ${lieu} <em>(inclus dans le tarif)</em></p><p style="font-size:13px;color:#555;margin:0"><span style="color:#d4af7a;font-weight:bold">›</span> Livraison à l'adresse de votre choix <em>(+ 100 € forfait livraison)</em></p></td></tr></table>`:'';
+
+  const msgHTML=msg?`<p style="font-size:13px;color:#444;line-height:1.8;border-left:3px solid #d4af7a;padding-left:12px;margin:16px 0;font-style:italic">${msg.replace(/\n/g,'<br>')}</p>`:'';
+
+  return `<html><body style="margin:0;padding:0;background:#f4f4f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f0;padding:30px 20px">
+<tr><td align="center">
+<table width="640" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e0e0e0">
+
+<tr><td style="background:#1a1a1a;padding:28px 32px 22px">
+<p style="font-family:Georgia,serif;font-size:22px;font-weight:bold;color:#d4af7a;letter-spacing:4px;text-transform:uppercase;margin:0">CAREPOLIS</p>
+<p style="font-size:9px;color:#888;letter-spacing:4px;text-transform:uppercase;margin:4px 0 0">Location de véhicules · Côte d'Azur</p>
+<div style="width:35px;height:1px;background:#d4af7a;margin:16px 0"></div>
+<p style="font-size:10px;color:#888;letter-spacing:2px;text-transform:uppercase;margin:0">Votre demande de location · ${d1} au ${d2} · ${lieu}</p>
+</td></tr>
+
+<tr><td style="padding:32px">
+<p style="font-family:Georgia,serif;font-size:20px;color:#1a1a1a;margin:0 0 12px">${salut} ${civ} ${nom},</p>
+<p style="font-size:13px;color:#555;line-height:1.8;margin:0 0 24px;font-family:Arial,sans-serif">Nous avons bien reçu votre demande et c'est avec grand plaisir que nous vous accueillerons dans l'une de nos agences.<br><br>Voici notre proposition pour votre séjour du <b>${d1} au ${d2}</b> (${j} jour${j>1?'s':''}), avec boîte automatique.</p>
+
+<p style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#d4af7a;margin:0 0 10px;font-weight:bold;font-family:Arial,sans-serif">VOTRE VÉHICULE</p>
+<table width="100%" cellpadding="16" cellspacing="0" style="background:#f9f9f7;border-radius:8px;border:1px solid #ebebeb;margin-bottom:24px">
+<tr><td width="60" valign="middle"><table width="50" height="50" cellpadding="0" cellspacing="0"><tr><td align="center" valign="middle" style="background:#1a1a1a;border-radius:50%;border:1px solid #d4af7a;width:50px;height:50px"><span style="font-family:Georgia,serif;font-size:14px;font-weight:bold;color:#d4af7a">${bdg}</span></td></tr></table></td>
+<td valign="middle"><p style="font-family:Georgia,serif;font-size:17px;font-weight:bold;color:#1a1a1a;margin:0">${veh}</p><p style="font-size:11px;color:#888;margin:4px 0 0;font-family:Arial,sans-serif">${d1} → ${d2} · ${lieu}</p></td></tr></table>
+
+<p style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#d4af7a;margin:0 0 10px;font-weight:bold;font-family:Arial,sans-serif">NOS FORMULES</p>
+<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px">
+<tr>
+<td width="48%" valign="top" style="border:1px solid #e8e8e8;border-radius:8px;padding:16px">
+<p style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#aaa;margin:0 0 4px;font-family:Arial,sans-serif">ÉCONOMIQUE</p>
+<p style="font-size:11px;color:#aaa;margin:0 0 8px;font-family:Arial,sans-serif">Location standard</p>
+<p style="font-family:Georgia,serif;font-size:32px;color:#1a1a1a;font-weight:bold;margin:0;line-height:1">${p1}<span style="font-size:13px;color:#aaa;font-weight:normal"> €/j</span></p>
+<p style="font-size:11px;color:#aaa;margin:4px 0 0;font-family:Arial,sans-serif">${p1*j} € pour ${j} jour${j>1?'s':''}</p>
+</td>
+<td width="4%"></td>
+<td width="48%" valign="top" style="border:2px solid #d4af7a;border-radius:8px;padding:16px;background:#fdfbf5">
+<p style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#d4af7a;margin:0 0 4px;font-family:Arial,sans-serif">★ RECOMMANDÉE</p>
+<p style="font-size:11px;color:#aaa;margin:0 0 8px;font-family:Arial,sans-serif">${modReco}</p>
+<p style="font-family:Georgia,serif;font-size:32px;color:#1a1a1a;font-weight:bold;margin:0;line-height:1">${p2}<span style="font-size:13px;color:#aaa;font-weight:normal"> €/j</span></p>
+<p style="font-size:11px;color:#aaa;margin:4px 0 0;font-family:Arial,sans-serif">${p2*j} € pour ${j} jour${j>1?'s':''}</p>
+</td>
+</tr></table>
+
+${optHTML}${livHTML}${msgHTML}
+
+<p style="font-size:13px;color:#555;line-height:1.8;margin:20px 0 24px;font-family:Arial,sans-serif">Ces options peuvent être combinées selon vos préférences. Dès réception de votre réponse, nous confirmerons votre réservation dans les meilleurs délais.<br><br>Nous nous réjouissons de vous accueillir sur la Côte d'Azur.</p>
+
+<p style="font-family:Georgia,serif;font-size:16px;color:#1a1a1a;font-style:italic;margin:0">L'équipe Carepolis</p>
+<p style="font-size:10px;color:#d4af7a;letter-spacing:2px;text-transform:uppercase;margin:4px 0 0;font-family:Arial,sans-serif">Service réservation · ${lieu}</p>
+<p style="font-size:11px;color:#bbb;margin:6px 0 0;font-family:Arial,sans-serif">${tel} · carepolis.com</p>
+</td></tr>
+
+<tr><td style="background:#f9f9f7;padding:12px 32px;border-top:1px solid #ebebeb">
+<table width="100%" cellpadding="0" cellspacing="0"><tr>
+<td style="font-size:10px;color:#bbb;letter-spacing:2px;text-transform:uppercase;font-family:Arial,sans-serif">Carepolis · Location · Var</td>
+<td align="right" style="font-size:10px;color:#d4af7a;font-family:Arial,sans-serif">carepolis.com</td>
+</tr></table>
+</td></tr>
+
+</table>
+</td></tr></table>
+</body></html>`;
+}
+
+function update(){
+  const civ=val('civ'),nom=val('nom');
+  const d1=val('date1'),d2=val('date2'),j=parseInt(val('jours'))||1;
+  const lieu=val('lieu'),veh=val('vehicule');
+  const p1=parseInt(val('prix1'))||0,p2=parseInt(val('prix2'))||0;
+  const tel=val('tel'),msg=val('message');
+  const modReco=val('modele_reco')||'Formule recommandée';
+  const salut=civ==='Madame'?'Chère':'Cher';
+
+  get('p-subject').textContent=`Votre demande de location · ${d1} au ${d2} · ${lieu}`;
+  get('p-greeting').textContent=`${salut} ${civ} ${nom},`;
+  get('p-intro').innerHTML=`Nous avons bien reçu votre demande et c'est avec grand plaisir que nous vous accueillerons dans l'une de nos agences.<br><br>Voici notre proposition pour votre séjour du <strong>${d1} au ${d2}</strong> (${j} jour${j>1?'s':''}), avec boîte automatique.`;
+  get('p-badge').textContent=badge(veh);
+  get('p-model').textContent=veh;
+  get('p-dates').textContent=`${d1} → ${d2} · ${lieu}`;
+  get('p-p1').innerHTML=`${p1}<span class="e-runit"> €/j</span>`;
+  get('p-t1').textContent=`${p1*j} € pour ${j} jour${j>1?'s':''}`;
+  get('p-p2').innerHTML=`${p2}<span class="e-runit"> €/j</span>`;
+  get('p-t2').textContent=`${p2*j} € pour ${j} jour${j>1?'s':''}`;
+  get('p-modele-reco').textContent=modReco;
+  get('p-lieu3').textContent=lieu;
+  get('p-tel').textContent=tel+' · carepolis.com';
+
+  const pp=get('optPP').checked,fr=get('optFR').checked;
+  let optHTML='';
+  if(pp||fr){
+    optHTML+=`<div class="e-section">Options d'assurance</div>`;
+    if(pp) optHTML+=`<div class="e-option"><div class="e-odot"></div><div style="flex:1"><div class="e-oname">Assurance Pare-brise & Pneus</div><div class="e-odesc">Couverture des dommages pare-brise et pneus.</div></div><div><div class="e-oprice">5 €/j</div><div class="e-ototal">${5*j} € / ${j}j</div></div></div>`;
+    if(fr) optHTML+=`<div class="e-option"><div class="e-odot"></div><div style="flex:1"><div class="e-oname">Réduction de Franchise</div><div class="e-odesc">Diminue significativement votre franchise.</div></div><div><div class="e-oprice">10 €/j</div><div class="e-ototal">${10*j} € / ${j}j</div></div></div>`;
+  }
+  get('block-options').innerHTML=optHTML;
+  get('block-livraison').innerHTML=get('optLiv').checked?`<div class="e-section">Remise du véhicule</div><div class="e-qbox"><div class="e-qtitle">Une précision nécessaire</div><div class="e-qtext">Afin de finaliser votre devis, pourriez-vous nous indiquer votre préférence ?</div><div class="e-qopt"><span class="e-qbullet">›</span><span>Récupération à notre concession à ${lieu} <em>(inclus)</em></span></div><div class="e-qopt"><span class="e-qbullet">›</span><span>Livraison à l'adresse de votre choix <em>(+ 100 €)</em></span></div></div>`:'';
+  get('block-message').innerHTML=msg?`<div class="e-msg">${msg.replace(/\n/g,'<br>')}</div>`:'';
+}
+
+function genererEML(){
+  const sujet=`Votre demande de location – ${val('date1')} au ${val('date2')} – ${val('lieu')}`;
+  const dest=val('emailDest');
+  const htmlBody=buildHTML();
+
+  const eml=`MIME-Version: 1.0\r\nDate: ${new Date().toUTCString()}\r\nFrom: Carepolis Location <location@carepolis.com>\r\nTo: ${dest}\r\nSubject: =?UTF-8?B?${btoa(unescape(encodeURIComponent(sujet)))}?=\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n${btoa(unescape(encodeURIComponent(htmlBody)))}`;
+
+  const blob=new Blob([eml],{type:'message/rfc822'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`devis_carepolis_${val('nom').toLowerCase().replace(/\s/g,'_')}.eml`;
+  a.click();
+}
+
+document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('input',update));
+update();
+</script>
+</body>
+</html>
